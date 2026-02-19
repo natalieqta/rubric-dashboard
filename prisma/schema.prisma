@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   // "Admin" | "Coach"
+  coachName    String?  // required when role = Coach; must match sheet Coach Name
+  createdAt    DateTime @default(now())
+}

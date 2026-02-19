@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Coach Performance Dashboard
 
-## Getting Started
+Role-based dashboard for coach performance evaluations. **Admin** sees org-wide analytics and user management; **Coach** sees only their developers.
 
-First, run the development server:
+## Setup
+
+1. **Environment**  
+   Copy `.env.example` to `.env` and set:
+   - `DATABASE_URL` — SQLite path (e.g. `file:./prisma/dev.db`)
+   - `AUTH_SECRET` — min 32 chars for NextAuth
+   - `AUTH_URL` — e.g. `http://localhost:3000`
+
+2. **Database**  
+   ```bash
+   npm run db:push
+   npm run db:seed
+   ```  
+   Seeds default admin: **admin@lumenalta.com** / **changeme123**
+
+3. **Data**  
+   Evaluation data is read from `data/evaluations.json`. Replace or symlink your export there.
+
+## Run
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Sign in as admin, or create a Coach user (User Management) with a `coachName` that exactly matches a Coach Name in the sheet.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Rules
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **No averages** — all metrics use distribution counts and percentages (L1–L4).
+- **Average Score column** from the sheet is never used.
+- **Coach name** on user accounts must exactly match the sheet; use the dropdown when creating Coach users.
