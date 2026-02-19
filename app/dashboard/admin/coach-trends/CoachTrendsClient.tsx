@@ -46,7 +46,7 @@ export function CoachTrendsClient({
     return coaches.filter((c) => c.toLowerCase().includes(q));
   }, [coaches, nameSearch]);
 
-  const byQuarter = new Map<string, Record<string, number>>();
+  const byQuarter = new Map<string, Record<string, number | string>>();
   for (const q of quarterLabels) {
     byQuarter.set(q, { quarterLabel: q });
   }
@@ -115,7 +115,7 @@ export function CoachTrendsClient({
                       border: "1px solid #e4e4e7",
                       boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                     }}
-                    formatter={(value: number) => [value?.toFixed(2) ?? "—", ""]}
+                    formatter={(value: number | undefined) => [value != null ? value.toFixed(2) : "—", ""]}
                     labelFormatter={(label) => `Quarter: ${label}`}
                   />
                   <Legend

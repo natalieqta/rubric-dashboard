@@ -52,7 +52,7 @@ export function TrendsClient({
   }, [developerNames, developerSearch]);
 
   const developerChartData = useMemo(() => {
-    const byQuarter = new Map<string, Record<string, number>>();
+    const byQuarter = new Map<string, Record<string, number | string>>();
     for (const q of quarters) {
       byQuarter.set(q.quarterLabel, { quarterLabel: q.quarterLabel });
     }
@@ -159,7 +159,7 @@ export function TrendsClient({
                   <YAxis domain={[1, 4]} tick={{ fontSize: 11, fill: "#71717a" }} tickCount={5} />
                   <Tooltip
                     contentStyle={{ borderRadius: 8, border: "1px solid #e4e4e7", fontSize: 12 }}
-                    formatter={(value: number) => [value?.toFixed(2) ?? "—", ""]}
+                    formatter={(value: number | undefined) => [value != null ? value.toFixed(2) : "—", ""]}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
                   {selectedDevelopers.map((name, i) => (
