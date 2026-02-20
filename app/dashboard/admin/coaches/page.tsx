@@ -1,5 +1,3 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
 import {
@@ -11,9 +9,6 @@ import {
 import { DIMENSION_LABELS } from "@/lib/schema";
 
 export default async function AdminCoachesPage() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "Admin") redirect("/login");
-
   const snapshots = getDeveloperQuarterSnapshots();
   const quarters = getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";

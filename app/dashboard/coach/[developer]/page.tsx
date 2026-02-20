@@ -1,7 +1,6 @@
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getDeveloperQuarterSnapshots, getQuartersSorted } from "@/lib/evaluations";
+import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
 import { getDeveloperTimeline } from "@/lib/risk";
 import { computeDeveloperRisk } from "@/lib/risk";
 import { RiskBadges } from "@/components/RiskBadges";
@@ -11,19 +10,21 @@ import { DeveloperDetailClient } from "./DeveloperDetailClient";
 
 export default async function CoachDeveloperDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ developer: string }>;
+  searchParams: Promise<{ coach?: string }>;
 }) {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
-  const user = session.user as { role?: string; coachName?: string | null };
-  if (user.role !== "Coach" || !user.coachName) redirect("/login");
+  const { coach: coachParam } = await searchParams;
+  const coachNames = getUniqueCoachNames();
+  const firstCoach = coachNames[0];
+  if (!firstCoach) redirect("/dashboard/admin");
+  const coachName = coachParam && coachNames.includes(coachParam) ? coachParam : firstCoach;
 
   const developerName = decodeURIComponent((await params).developer);
-  const coachName = user.coachName;
   const snapshots = getDeveloperQuarterSnapshots({ coachName });
   const coachSnapshots = snapshots.filter((s) => s.consultantName === developerName);
-  if (coachSnapshots.length === 0) redirect("/dashboard/coach");
+  if (coachSnapshots.length === 0) redirect(`/dashboard/coach?coach=${encodeURIComponent(coachName)}`);
 
   const timeline = getDeveloperTimeline(snapshots, coachName, developerName);
   const quarters = getQuartersSorted();
@@ -35,7 +36,7 @@ export default async function CoachDeveloperDetailPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/dashboard/coach" className="text-sm text-blue-600 hover:underline">
+        <Link href={`/dashboard/coach?coach=${encodeURIComponent(coachName)}`} className="text-sm text-blue-600 hover:underline">
           ← My Developers
         </Link>
         <h1 className="text-2xl font-semibold text-zinc-900">{developerName}</h1>

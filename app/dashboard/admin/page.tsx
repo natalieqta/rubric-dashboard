@@ -1,5 +1,3 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { getDeveloperQuarterSnapshots, getQuartersSorted } from "@/lib/evaluations";
 import {
   getDistributionForSnapshots,
@@ -16,9 +14,6 @@ export default async function AdminOrgOverviewPage({
 }: {
   searchParams: Promise<{ quarter?: string }>;
 }) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "Admin") redirect("/login");
-
   const { quarter: quarterParam } = await searchParams;
   const snapshots = getDeveloperQuarterSnapshots();
   const quarters = getQuartersSorted();

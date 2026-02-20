@@ -4,13 +4,17 @@ Role-based dashboard for coach performance evaluations. **Admin** sees org-wide 
 
 ## Setup
 
-1. **Environment**  
-   Copy `.env.example` to `.env` and set:
-   - `DATABASE_URL` — SQLite path (e.g. `file:./prisma/dev.db`)
-   - `AUTH_SECRET` — min 32 chars for NextAuth
-   - `AUTH_URL` — e.g. `http://localhost:3000`
+1. **Database (Supabase)**  
+   - Create a project at [supabase.com](https://supabase.com).
+   - In **Project Settings → Database**, copy the **Connection string (URI)**. Use the **Transaction** pooler (port 6543) for Prisma.
+   - Create a `.env` and set `DATABASE_URL` to that URI (replace `[YOUR-PASSWORD]` with your database password).
 
-2. **Database**  
+2. **Environment**  
+   In `.env` also set:
+   - `AUTH_SECRET` — min 32 chars (e.g. `openssl rand -base64 32`)
+   - `AUTH_URL` — `http://localhost:3000` locally, or `https://your-app.vercel.app` in production
+
+3. **Schema & seed**  
    ```bash
    npm run db:push
    npm run db:seed

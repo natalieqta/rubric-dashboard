@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getDeveloperQuarterSnapshots, getQuartersSorted, isHiddenCoach } from "@/lib/evaluations";
@@ -13,9 +12,6 @@ export default async function CoachPortfolioPage({
 }: {
   params: Promise<{ coachName: string }>;
 }) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "Admin") redirect("/login");
-
   const { coachName } = await params;
   const decoded = decodeURIComponent(coachName);
   if (isHiddenCoach(decoded)) redirect("/dashboard/admin/coaches");

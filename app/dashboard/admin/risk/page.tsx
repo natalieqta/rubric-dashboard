@@ -1,5 +1,3 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames, isHiddenCoach } from "@/lib/evaluations";
 import { getSnapshotsOnePerDeveloper } from "@/lib/aggregations";
 import { computeDeveloperRisk, isAtRisk, getDeveloperTimeline } from "@/lib/risk";
@@ -8,9 +6,6 @@ import { RiskTable } from "./RiskTable";
 import type { DeveloperQuarterSnapshot } from "@/lib/schema";
 
 export default async function AdminRiskPage() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "Admin") redirect("/login");
-
   const snapshots = getDeveloperQuarterSnapshots();
   const quarters = getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";

@@ -1,7 +1,6 @@
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getDeveloperQuarterSnapshots, getQuartersSorted } from "@/lib/evaluations";
+import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
 import {
   getDistributionForSnapshots,
   getTrend,
@@ -13,13 +12,19 @@ import { ScoreBadge } from "@/components/ScoreBadge";
 import { TrendArrow } from "@/components/TrendArrow";
 import { CoachPortfolioHealth } from "./CoachPortfolioHealth";
 
-export default async function CoachDashboardPage() {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
-  const user = session.user as { role?: string; coachName?: string | null };
-  if (user.role !== "Coach" || !user.coachName) redirect("/login");
-
-  const coachName = user.coachName;
+export default async function CoachDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ coach?: string }>;
+}) {
+  const { coach: coachParam } = await searchParams;
+  const coachNames = getUniqueCoachNames();
+  const firstCoach = coachNames[0];
+  if (!firstCoach) redirect("/dashboard/admin");
+  const coachName = coachParam && coachNames.includes(coachParam) ? coachParam : firstCoach;
+  if (!coachParam || !coachNames.includes(coachParam)) {
+    redirect(`/dashboard/coach?coach=${encodeURIComponent(coachName)}`);
+  }
   const snapshots = getDeveloperQuarterSnapshots({ coachName });
   const quarters = getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
@@ -102,7 +107,7 @@ export default async function CoachDashboardPage() {
                   </td>
                   <td className="px-4 py-2">
                     <Link
-                      href={`/dashboard/coach/${encodeURIComponent(r.consultantName)}`}
+                      href={`/dashboard/coach/${encodeURIComponent(r.consultantName)}?coach=${encodeURIComponent(coachName)}`}
                       className="text-blue-600 hover:underline"
                     >
                       Detail

@@ -1,13 +1,8 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames, isHiddenCoach } from "@/lib/evaluations";
 import { getDistributionForSnapshots, getSnapshotsOnePerDeveloper, getDeveloperAverageScoreByQuarter } from "@/lib/aggregations";
 import { TrendsClient } from "./TrendsClient";
 
 export default async function AdminTrendsPage() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "Admin") redirect("/login");
-
   const allSnapshots = getDeveloperQuarterSnapshots();
   const snapshots = allSnapshots.filter((s) => !isHiddenCoach(s.coachName));
   const quarters = getQuartersSorted();

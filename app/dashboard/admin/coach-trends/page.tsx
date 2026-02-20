@@ -1,5 +1,3 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import {
   getDeveloperQuarterSnapshots,
   getQuartersSorted,
@@ -12,11 +10,6 @@ import {
 import { CoachTrendsClient } from "./CoachTrendsClient";
 
 export default async function CoachTrendsPage() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "Admin") {
-    redirect("/login");
-  }
-
   const snapshots = getDeveloperQuarterSnapshots();
   const quarters = getQuartersSorted();
   const allMetrics = getCoachAverageScoreByQuarter(snapshots, quarters);
