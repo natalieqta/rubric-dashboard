@@ -24,6 +24,10 @@ export const DIMENSION_LABELS: Record<DimensionKey, string> = {
 /** Score 1-4 or null (N/A, empty, malformed) */
 export type Score = 1 | 2 | 3 | 4 | null;
 
+/** Rater role for 360 feedback form. */
+export const RATER_ROLES = ["Coach", "Product", "Tech Lead", "Team Member"] as const;
+export type RaterRole = (typeof RATER_ROLES)[number];
+
 export const SCORE_LABELS: Record<1 | 2 | 3 | 4, string> = {
   1: "Below Expectations",
   2: "Progressing",
@@ -56,6 +60,27 @@ export interface ParsedEvaluation {
   summaryForBrainsNotes: string;
   quarterLabel: string;
   quarterKey: string;
+}
+
+/** Single 360 feedback form submission (stored in data/feedback-360.json). */
+export interface Feedback360Submission {
+  id: string;
+  raterId: string;
+  raterName: string;
+  raterRole: RaterRole;
+  subjectName: string;
+  quarterKey: string;
+  timestamp: string; // ISO
+  techMastery: 1 | 2 | 3 | 4;
+  techMasteryAssertions?: string;
+  buildTrust: 1 | 2 | 3 | 4;
+  buildTrustAssertions?: string;
+  resilientUnderPressure: 1 | 2 | 3 | 4;
+  resilientUnderPressureAssertions?: string;
+  teamPlayer: 1 | 2 | 3 | 4;
+  teamPlayerAssertions?: string;
+  moveFast: 1 | 2 | 3 | 4;
+  moveFastAssertions?: string;
 }
 
 /** One evaluation per (coach, developer, quarter) - latest in that quarter */

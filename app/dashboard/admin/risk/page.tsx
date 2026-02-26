@@ -1,4 +1,4 @@
-import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames, isHiddenCoach } from "@/lib/evaluations";
+import { getMergedRecordsForDashboard, getQuartersSorted, getUniqueCoachNames, isHiddenCoach } from "@/lib/evaluations";
 import { getSnapshotsOnePerDeveloper } from "@/lib/aggregations";
 import { computeDeveloperRisk, isAtRisk, getDeveloperTimeline } from "@/lib/risk";
 import { getTrend } from "@/lib/aggregations";
@@ -6,7 +6,7 @@ import { RiskTable } from "./RiskTable";
 import type { DeveloperQuarterSnapshot } from "@/lib/schema";
 
 export default async function AdminRiskPage() {
-  const snapshots = getDeveloperQuarterSnapshots();
+  const snapshots = getMergedRecordsForDashboard();
   const quarters = getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
   const onePerDev = getSnapshotsOnePerDeveloper(snapshots, currentQuarterKey);

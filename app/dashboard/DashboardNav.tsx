@@ -8,6 +8,7 @@ export function DashboardNav({ coachNames }: { coachNames: string[] }) {
   const searchParams = useSearchParams();
   const isAdmin = pathname.startsWith("/dashboard/admin");
   const isCoach = pathname.startsWith("/dashboard/coach");
+  const isFeedback = pathname === "/dashboard/feedback";
   const coachParam = isCoach ? searchParams.get("coach") : null;
   const currentCoach = coachParam ?? coachNames[0] ?? "";
   const coachQuery = currentCoach ? `?coach=${encodeURIComponent(currentCoach)}` : "";
@@ -22,18 +23,28 @@ export function DashboardNav({ coachNames }: { coachNames: string[] }) {
           <NavLink href="/dashboard/admin/coach-trends">Coach trends</NavLink>
           <NavLink href="/dashboard/admin/trends">Trends</NavLink>
           <NavLink href="/dashboard/admin/users">User Management</NavLink>
+          <NavLink href="/dashboard/admin/feedback">360 Submissions</NavLink>
+          <NavLink href="/dashboard/feedback">360 Feedback</NavLink>
         </>
       )}
       {isCoach && (
         <>
           <NavLink href={`/dashboard/coach${coachQuery}`}>My Developers</NavLink>
           <NavLink href={`/dashboard/coach${coachQuery}#portfolio-health`}>Portfolio Health</NavLink>
+          <NavLink href="/dashboard/feedback">360 Feedback</NavLink>
+          <NavLink href="/dashboard/admin/feedback">360 Submissions</NavLink>
           {coachNames.length > 1 && (
             <div className="mt-3 border-t border-zinc-200 pt-2">
               <p className="px-3 py-1 text-xs font-medium text-zinc-500">Viewing as coach</p>
               <CoachSelector coachNames={coachNames} currentCoach={currentCoach} />
             </div>
           )}
+        </>
+      )}
+      {(isFeedback || (!isAdmin && !isCoach && pathname.startsWith("/dashboard"))) && (
+        <>
+          <NavLink href="/dashboard/admin">Dashboard</NavLink>
+          <NavLink href="/dashboard/feedback">360 Feedback</NavLink>
         </>
       )}
     </nav>

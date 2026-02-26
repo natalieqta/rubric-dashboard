@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
+import { getMergedRecordsForDashboard, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
 import {
   getDistributionForSnapshots,
   getTrend,
@@ -25,7 +25,7 @@ export default async function CoachDashboardPage({
   if (!coachParam || !coachNames.includes(coachParam)) {
     redirect(`/dashboard/coach?coach=${encodeURIComponent(coachName)}`);
   }
-  const snapshots = getDeveloperQuarterSnapshots({ coachName });
+  const snapshots = getMergedRecordsForDashboard({ coachName });
   const quarters = getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
   const developers = Array.from(

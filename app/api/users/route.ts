@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
@@ -8,7 +8,7 @@ export async function GET() {
   if (!session?.user || (session.user as { role?: string }).role !== "Admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const users = await prisma.user.findMany({
+  const users = await db.user.findMany({
     orderBy: { createdAt: "desc" },
     select: { id: true, email: true, name: true, role: true, coachName: true, createdAt: true },
   });
@@ -34,10 +34,10 @@ export async function POST(req: Request) {
   if (role === "Coach" && !coachName) {
     return NextResponse.json({ error: "Coach requires coachName" }, { status: 400 });
   }
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await db.user.findUnique({ where: { email } });
   if (existing) return NextResponse.json({ error: "Email already exists" }, { status: 400 });
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
+  const user = await db.user.create({
     data: {
       email,
       passwordHash,

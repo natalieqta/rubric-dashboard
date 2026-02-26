@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
@@ -26,7 +26,7 @@ export async function PATCH(
   if (role != null) update.role = role;
   if (coachName !== undefined) update.coachName = role === "Coach" ? coachName : null;
   if (password != null && password !== "") update.passwordHash = await bcrypt.hash(password, 10);
-  const user = await prisma.user.update({
+  const user = await db.user.update({
     where: { id },
     data: update,
     select: { id: true, email: true, name: true, role: true, coachName: true, createdAt: true },
@@ -43,6 +43,6 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
-  await prisma.user.delete({ where: { id } });
+  await db.user.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }

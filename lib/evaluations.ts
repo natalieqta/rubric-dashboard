@@ -5,8 +5,10 @@
  */
 
 import evaluationsData from "@/data/evaluations.json";
+import { getQuarterLabel } from "./quarters";
 import { parseEvaluationRow, type RawEvaluationRow } from "./parse";
 import type { ParsedEvaluation, DeveloperQuarterSnapshot } from "./schema";
+import { listFeedback360 } from "./feedback-360";
 
 /** Coaches to hide from lists and dashboards (e.g. no longer active). */
 export const HIDDEN_COACH_NAMES = ["Erica Franken", "Gabriela Torres", "Vanessa Fernandez"] as const;
@@ -84,6 +86,84 @@ export function getQuartersSorted(options?: { now?: Date }): { quarterKey: strin
   }
   const keys = Array.from(seen.keys()).sort();
   return keys.map((quarterKey) => ({ quarterKey, quarterLabel: seen.get(quarterKey)! }));
+}
+
+/** Distinct consultant names from evaluation data (canonical subject list for 360 form). */
+export function getCanonicalSubjectNames(): string[] {
+  const parsed = getParsedEvaluations();
+  const set = new Set(parsed.map((p) => p.consultantName).filter(Boolean));
+  return Array.from(set).sort();
+}
+
+/** Options for merged dashboard data. coachName set = coach view (only their developers); unset = admin org-wide. */
+export interface GetMergedRecordsForDashboardOptions {
+  coachName?: string;
+}
+
+/**
+ * Returns evaluation-like records for dashboard: snapshots + normalized 360 submissions.
+ * Scoped by coachName for coach (subjects = their developers) or org-wide for admin.
+ * Distribution logic can count by level; no averages. Coach sees only their developers.
+ */
+export function getMergedRecordsForDashboard(
+  options?: GetMergedRecordsForDashboardOptions
+): DeveloperQuarterSnapshot[] {
+  const snapshots = getDeveloperQuarterSnapshots(options);
+  const coachName = options?.coachName;
+
+  const developerSet = coachName
+    ? new Set(snapshots.map((s) => s.consultantName))
+    : undefined;
+  const subjectAllowlist =
+    developerSet && developerSet.size > 0 ? Array.from(developerSet) : undefined;
+
+  const feedback360 = listFeedback360({
+    subjectNamesAllowlist: coachName ? subjectAllowlist : undefined,
+  });
+
+  const allSnapshotsForCoachMap = getDeveloperQuarterSnapshots();
+  const consultantToCoach = new Map<string, string>();
+  for (const s of allSnapshotsForCoachMap) {
+    if (!consultantToCoach.has(s.consultantName)) {
+      consultantToCoach.set(s.consultantName, s.coachName);
+    }
+  }
+
+  const quarters = getQuartersSorted();
+  const quarterLabelByKey = new Map(quarters.map((q) => [q.quarterKey, q.quarterLabel]));
+
+  function quarterKeyToLabel(quarterKey: string): string {
+    const existing = quarterLabelByKey.get(quarterKey);
+    if (existing) return existing;
+    const m = quarterKey.match(/^(\d{4})-Q([1-4])$/);
+    if (!m) return quarterKey;
+    const year = parseInt(m[1]!, 10);
+    const quarter = parseInt(m[2]!, 10) as 1 | 2 | 3 | 4;
+    return getQuarterLabel(year, quarter);
+  }
+
+  const converted: DeveloperQuarterSnapshot[] = feedback360.map((sub) => ({
+    coachName: coachName ?? consultantToCoach.get(sub.subjectName) ?? "Unknown",
+    consultantName: sub.subjectName,
+    quarterLabel: quarterKeyToLabel(sub.quarterKey),
+    quarterKey: sub.quarterKey,
+    techMastery: sub.techMastery,
+    buildTrust: sub.buildTrust,
+    resilientUnderPressure: sub.resilientUnderPressure,
+    teamPlayer: sub.teamPlayer,
+    moveFast: sub.moveFast,
+    assertions: {
+      techMastery: sub.techMasteryAssertions ?? "",
+      buildTrust: sub.buildTrustAssertions ?? "",
+      resilientUnderPressure: sub.resilientUnderPressureAssertions ?? "",
+      teamPlayer: sub.teamPlayerAssertions ?? "",
+      moveFast: sub.moveFastAssertions ?? "",
+    },
+    summaryForBrainsNotes: "",
+    evaluationTimestamp: new Date(sub.timestamp),
+  }));
+
+  return [...snapshots, ...converted];
 }
 
 export function invalidateEvaluationsCache(): void {

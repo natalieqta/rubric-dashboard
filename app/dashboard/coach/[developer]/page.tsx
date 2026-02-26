@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
+import { getMergedRecordsForDashboard, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
 import { getDeveloperTimeline } from "@/lib/risk";
 import { computeDeveloperRisk } from "@/lib/risk";
 import { RiskBadges } from "@/components/RiskBadges";
@@ -22,7 +22,7 @@ export default async function CoachDeveloperDetailPage({
   const coachName = coachParam && coachNames.includes(coachParam) ? coachParam : firstCoach;
 
   const developerName = decodeURIComponent((await params).developer);
-  const snapshots = getDeveloperQuarterSnapshots({ coachName });
+  const snapshots = getMergedRecordsForDashboard({ coachName });
   const coachSnapshots = snapshots.filter((s) => s.consultantName === developerName);
   if (coachSnapshots.length === 0) redirect(`/dashboard/coach?coach=${encodeURIComponent(coachName)}`);
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
+import { getMergedRecordsForDashboard, getQuartersSorted, getUniqueCoachNames } from "@/lib/evaluations";
 import {
   getDistributionForSnapshots,
   getImprovedDeclinedFlat,
@@ -9,7 +9,7 @@ import {
 import { DIMENSION_LABELS } from "@/lib/schema";
 
 export default async function AdminCoachesPage() {
-  const snapshots = getDeveloperQuarterSnapshots();
+  const snapshots = getMergedRecordsForDashboard();
   const quarters = getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
   const coaches = getUniqueCoachNames();

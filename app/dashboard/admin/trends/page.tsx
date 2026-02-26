@@ -1,9 +1,9 @@
-import { getDeveloperQuarterSnapshots, getQuartersSorted, getUniqueCoachNames, isHiddenCoach } from "@/lib/evaluations";
+import { getMergedRecordsForDashboard, getQuartersSorted, getUniqueCoachNames, isHiddenCoach } from "@/lib/evaluations";
 import { getDistributionForSnapshots, getSnapshotsOnePerDeveloper, getDeveloperAverageScoreByQuarter } from "@/lib/aggregations";
 import { TrendsClient } from "./TrendsClient";
 
 export default async function AdminTrendsPage() {
-  const allSnapshots = getDeveloperQuarterSnapshots();
+  const allSnapshots = getMergedRecordsForDashboard();
   const snapshots = allSnapshots.filter((s) => !isHiddenCoach(s.coachName));
   const quarters = getQuartersSorted();
   const coaches = getUniqueCoachNames();

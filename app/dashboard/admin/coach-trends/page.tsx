@@ -1,5 +1,5 @@
 import {
-  getDeveloperQuarterSnapshots,
+  getMergedRecordsForDashboard,
   getQuartersSorted,
   isHiddenCoach,
 } from "@/lib/evaluations";
@@ -10,7 +10,7 @@ import {
 import { CoachTrendsClient } from "./CoachTrendsClient";
 
 export default async function CoachTrendsPage() {
-  const snapshots = getDeveloperQuarterSnapshots();
+  const snapshots = getMergedRecordsForDashboard();
   const quarters = getQuartersSorted();
   const allMetrics = getCoachAverageScoreByQuarter(snapshots, quarters);
   const metrics = allMetrics.filter((m) => !isHiddenCoach(m.coachName));

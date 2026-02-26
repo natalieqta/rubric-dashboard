@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getDeveloperQuarterSnapshots, getQuartersSorted, isHiddenCoach } from "@/lib/evaluations";
+import { getMergedRecordsForDashboard, getQuartersSorted, isHiddenCoach } from "@/lib/evaluations";
 import { getDistributionForSnapshots, getRiskSummary } from "@/lib/aggregations";
 import { DIMENSION_LABELS } from "@/lib/schema";
 import { computeDeveloperRisk, isAtRisk } from "@/lib/risk";
@@ -15,7 +15,7 @@ export default async function CoachPortfolioPage({
   const { coachName } = await params;
   const decoded = decodeURIComponent(coachName);
   if (isHiddenCoach(decoded)) redirect("/dashboard/admin/coaches");
-  const snapshots = getDeveloperQuarterSnapshots();
+  const snapshots = getMergedRecordsForDashboard();
   const quarters = getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
   const coachSnapshots = snapshots.filter((s) => s.coachName === decoded && s.quarterKey === currentQuarterKey);
