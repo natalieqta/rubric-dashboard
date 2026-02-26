@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { getCanonicalSubjectNames } from "@/lib/feedback-360";
+import { getCanonicalSubjectNames } from "@/lib/evaluations";
 import { NextResponse } from "next/server";
 
 export async function GET() {

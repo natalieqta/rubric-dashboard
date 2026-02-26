@@ -1,4 +1,4 @@
-import { getCanonicalSubjectNames } from "@/lib/feedback-360";
+import { getCanonicalSubjectNames } from "@/lib/evaluations";
 import { FeedbackFormClient } from "./FeedbackFormClient";
 
 export default async function FeedbackPage() {
