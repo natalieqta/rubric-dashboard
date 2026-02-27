@@ -186,7 +186,7 @@ export function TrendsClient({
           Org: % at each level over time
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Organization-wide distribution by dimension. Data from <code className="rounded bg-zinc-100 px-1 py-0.5 text-xs">data/evaluations.json</code>.
+          Organization-wide distribution by dimension. Data from <code className="rounded bg-zinc-100 px-1 py-0.5 text-xs">Google Sheets</code>.
         </p>
         <div className="mt-4 space-y-6">
           {dims.map((dim) => {

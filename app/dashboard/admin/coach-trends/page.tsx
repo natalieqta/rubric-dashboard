@@ -10,8 +10,8 @@ import {
 import { CoachTrendsClient } from "./CoachTrendsClient";
 
 export default async function CoachTrendsPage() {
-  const snapshots = getMergedRecordsForDashboard();
-  const quarters = getQuartersSorted();
+  const snapshots = await getMergedRecordsForDashboard();
+  const quarters = await getQuartersSorted();
   const allMetrics = getCoachAverageScoreByQuarter(snapshots, quarters);
   const metrics = allMetrics.filter((m) => !isHiddenCoach(m.coachName));
 
@@ -30,7 +30,7 @@ export default async function CoachTrendsPage() {
           Coach trends
         </h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Data from <code className="rounded bg-zinc-100 px-1 py-0.5 text-xs">data/evaluations.json</code>
+          Data from <code className="rounded bg-zinc-100 px-1 py-0.5 text-xs">Google Sheets</code>
         </p>
       </div>
       <CoachTrendsClient

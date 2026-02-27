@@ -15,8 +15,8 @@ export default async function AdminOrgOverviewPage({
   searchParams: Promise<{ quarter?: string }>;
 }) {
   const { quarter: quarterParam } = await searchParams;
-  const snapshots = getMergedRecordsForDashboard();
-  const quarters = getQuartersSorted();
+  const snapshots = await getMergedRecordsForDashboard();
+  const quarters = await getQuartersSorted();
   const defaultQuarter = quarters.length ? quarters[quarters.length - 1]!.quarterKey : null;
   const quarterKey = quarterParam && quarters.some((q) => q.quarterKey === quarterParam) ? quarterParam : (defaultQuarter ?? "");
 

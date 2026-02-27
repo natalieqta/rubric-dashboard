@@ -12,7 +12,7 @@ function getMonthOptions(): string[] {
 }
 
 export default async function AdminFeedbackPage() {
-  const quarterOptions = getQuartersSorted();
+  const quarterOptions = await getQuartersSorted();
   const monthOptions = getMonthOptions();
 
   return (

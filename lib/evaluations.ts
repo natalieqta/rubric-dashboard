@@ -1,10 +1,9 @@
 /**
- * Load and expose evaluation data. Single source: data/evaluations.json.
+ * Load and expose evaluation data. Single source: Google Sheets via getRawEvaluationsFromSheet.
  * Builds latest evaluation per (coach, developer, quarter).
- * Uses static import so this module is safe in Edge runtime (no Node.js "fs").
  */
 
-import evaluationsData from "@/data/evaluations.json";
+import { getRawEvaluationsFromSheet } from "@/lib/evaluations-sheet";
 import { getQuarterLabel } from "./quarters";
 import { parseEvaluationRow, type RawEvaluationRow } from "./parse";
 import type { ParsedEvaluation, DeveloperQuarterSnapshot } from "./schema";
@@ -17,29 +16,32 @@ export function isHiddenCoach(name: string): boolean {
   return (HIDDEN_COACH_NAMES as readonly string[]).includes(name);
 }
 
+let cachedRaw: RawEvaluationRow[] | null = null;
 let cachedParsed: ParsedEvaluation[] | null = null;
 let cachedSnapshots: DeveloperQuarterSnapshot[] | null = null;
 
-function loadRaw(): unknown[] {
-  const data = evaluationsData as unknown;
-  return Array.isArray(data) ? data : [];
+async function loadRaw(): Promise<RawEvaluationRow[]> {
+  if (cachedRaw) return cachedRaw;
+  const raw = await getRawEvaluationsFromSheet();
+  cachedRaw = raw;
+  return raw;
 }
 
-export function getParsedEvaluations(options?: { now?: Date }): ParsedEvaluation[] {
+export async function getParsedEvaluations(options?: { now?: Date }): Promise<ParsedEvaluation[]> {
   if (cachedParsed) return cachedParsed;
-  const raw = loadRaw() as RawEvaluationRow[];
+  const raw = await loadRaw();
   const now = options?.now ?? new Date();
   cachedParsed = raw.map((row) => parseEvaluationRow(row, { now }) as ParsedEvaluation);
   return cachedParsed;
 }
 
 /** Latest evaluation per (coachName, consultantName, quarterKey). */
-export function getDeveloperQuarterSnapshots(options?: {
+export async function getDeveloperQuarterSnapshots(options?: {
   now?: Date;
   coachName?: string;
-}): DeveloperQuarterSnapshot[] {
+}): Promise<DeveloperQuarterSnapshot[]> {
   if (cachedSnapshots && !options?.coachName) return cachedSnapshots;
-  const parsed = getParsedEvaluations(options);
+  const parsed = await getParsedEvaluations(options);
   const byKey = new Map<string, ParsedEvaluation>();
   for (const p of parsed) {
     if (options?.coachName && p.coachName !== options.coachName) continue;
@@ -71,15 +73,15 @@ export function getDeveloperQuarterSnapshots(options?: {
   return snapshots;
 }
 
-export function getUniqueCoachNames(): string[] {
-  const parsed = getParsedEvaluations();
+export async function getUniqueCoachNames(): Promise<string[]> {
+  const parsed = await getParsedEvaluations();
   const set = new Set(parsed.map((p) => p.coachName).filter(Boolean));
   return Array.from(set).filter((name) => !isHiddenCoach(name)).sort();
 }
 
 /** All quarter keys (e.g. 2025-Q2) sorted ascending; labels for display. */
-export function getQuartersSorted(options?: { now?: Date }): { quarterKey: string; quarterLabel: string }[] {
-  const parsed = getParsedEvaluations(options);
+export async function getQuartersSorted(options?: { now?: Date }): Promise<{ quarterKey: string; quarterLabel: string }[]> {
+  const parsed = await getParsedEvaluations(options);
   const seen = new Map<string, string>();
   for (const p of parsed) {
     if (!seen.has(p.quarterKey)) seen.set(p.quarterKey, p.quarterLabel);
@@ -89,8 +91,8 @@ export function getQuartersSorted(options?: { now?: Date }): { quarterKey: strin
 }
 
 /** Distinct consultant names from evaluation data (canonical subject list for 360 form). */
-export function getCanonicalSubjectNames(): string[] {
-  const parsed = getParsedEvaluations();
+export async function getCanonicalSubjectNames(): Promise<string[]> {
+  const parsed = await getParsedEvaluations();
   const set = new Set(parsed.map((p) => p.consultantName).filter(Boolean));
   return Array.from(set).sort();
 }
@@ -105,10 +107,10 @@ export interface GetMergedRecordsForDashboardOptions {
  * Scoped by coachName for coach (subjects = their developers) or org-wide for admin.
  * Distribution logic can count by level; no averages. Coach sees only their developers.
  */
-export function getMergedRecordsForDashboard(
+export async function getMergedRecordsForDashboard(
   options?: GetMergedRecordsForDashboardOptions
-): DeveloperQuarterSnapshot[] {
-  const snapshots = getDeveloperQuarterSnapshots(options);
+): Promise<DeveloperQuarterSnapshot[]> {
+  const snapshots = await getDeveloperQuarterSnapshots(options);
   const coachName = options?.coachName;
 
   const developerSet = coachName
@@ -121,7 +123,7 @@ export function getMergedRecordsForDashboard(
     subjectNamesAllowlist: coachName ? subjectAllowlist : undefined,
   });
 
-  const allSnapshotsForCoachMap = getDeveloperQuarterSnapshots();
+  const allSnapshotsForCoachMap = await getDeveloperQuarterSnapshots();
   const consultantToCoach = new Map<string, string>();
   for (const s of allSnapshotsForCoachMap) {
     if (!consultantToCoach.has(s.consultantName)) {
@@ -129,7 +131,7 @@ export function getMergedRecordsForDashboard(
     }
   }
 
-  const quarters = getQuartersSorted();
+  const quarters = await getQuartersSorted();
   const quarterLabelByKey = new Map(quarters.map((q) => [q.quarterKey, q.quarterLabel]));
 
   function quarterKeyToLabel(quarterKey: string): string {
@@ -167,6 +169,7 @@ export function getMergedRecordsForDashboard(
 }
 
 export function invalidateEvaluationsCache(): void {
+  cachedRaw = null;
   cachedParsed = null;
   cachedSnapshots = null;
 }

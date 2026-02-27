@@ -11,7 +11,7 @@ Add a 360° feedback form filled out by coaches, product, tech leads, and team m
 
 **Language/Version**: TypeScript 5.x  
 **Primary Dependencies**: Next.js 16, React 19, NextAuth 5 (beta), recharts, bcryptjs  
-**Storage**: Existing: `data/evaluations.json` (evaluations), in-memory user store. New: `data/feedback-360.json` (360 form submissions); all evaluation-like reads go through `lib/evaluations.ts` (and a 360 merge layer).  
+**Storage**: Existing: Google Sheets (evaluations via `lib/evaluations-sheet.ts`), in-memory user store. New: `data/feedback-360.json` (360 form submissions); all evaluation-like reads go through `lib/evaluations.ts` (and a 360 merge layer).  
 **Testing**: No formal test framework in repo; manual / E2E for MVP.  
 **Target Platform**: Web (Next.js); server and client components.  
 **Project Type**: Web application (Next.js App Router).  
@@ -75,8 +75,7 @@ lib/
 └── auth.ts              # existing
 
 data/
-├── evaluations.json     # existing
-└── feedback-360.json    # NEW: 360 form submissions (array of records)
+└── feedback-360.json    # NEW: 360 form submissions (array of records). Evaluations from Google Sheets.
 ```
 
 **Structure Decision**: Single Next.js app. New surface: `app/api/feedback/` (submit + list), `app/dashboard/feedback/` or integrated into admin/coach nav for form and submissions view, `data/feedback-360.json`, and lib extensions for 360 storage + merge into evaluation pipeline.

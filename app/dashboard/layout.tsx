@@ -4,12 +4,15 @@ import { getUniqueCoachNames } from "@/lib/evaluations";
 import { DashboardNav } from "./DashboardNav";
 import { ViewToggle } from "./ViewToggle";
 
+/** Dashboard depends on evaluation data from Google Sheets (runtime env); do not statically prerender. */
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const coachNames = getUniqueCoachNames();
+  const coachNames = await getUniqueCoachNames();
 
   return (
     <div className="flex min-h-screen bg-zinc-50">

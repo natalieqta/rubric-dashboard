@@ -22,7 +22,10 @@ Role-based dashboard for coach performance evaluations. **Admin** sees org-wide 
    Seeds default admin: **admin@lumenalta.com** / **changeme123**
 
 3. **Data**  
-   Evaluation data is read from `data/evaluations.json`. Replace or symlink your export there.
+   Evaluation data is read from **Google Sheets** via the Sheets API. Set in `.env` (or Vercel):
+   - `GOOGLE_SERVICE_ACCOUNT_EMAIL` — service account email
+   - `GOOGLE_PRIVATE_KEY` — private key (newlines as `\n`)
+   Share the sheet with the service account email. The app uses spreadsheet ID and sheet gid configured in `lib/evaluations-sheet.ts`. Raw data is also exposed at `GET /api/evaluations`.
 
 ## Run
 

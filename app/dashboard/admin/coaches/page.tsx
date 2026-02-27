@@ -9,10 +9,11 @@ import {
 import { DIMENSION_LABELS } from "@/lib/schema";
 
 export default async function AdminCoachesPage() {
-  const snapshots = getMergedRecordsForDashboard();
-  const quarters = getQuartersSorted();
+  const snapshots = await getMergedRecordsForDashboard();
+  const quarters = await getQuartersSorted();
+  const coaches = await getUniqueCoachNames();
+
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
-  const coaches = getUniqueCoachNames();
 
   const rows: {
     coachName: string;

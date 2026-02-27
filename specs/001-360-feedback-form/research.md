@@ -8,12 +8,12 @@
 **Decision**: Store submissions in a single JSON file at `data/feedback-360.json` (array of submission objects). No new database or external service.
 
 **Rationale**:
-- Constitution V (Simplicity): avoid adding persistence layers unless clearly required. Current app already uses `data/evaluations.json` and in-memory users; a second JSON file is consistent and easy to version/deploy.
+- Constitution V (Simplicity): avoid adding persistence layers unless clearly required. Current app uses Google Sheets for evaluations and in-memory users; a second JSON file for 360 is consistent and easy to version/deploy.
 - Constitution II (Single source of truth): the *read* path is what must be unified. By merging 360 data in `lib/evaluations.ts` (or a dedicated reader that the evaluations module uses), all dashboard reads still go through one layer. The *write* path for 360 can be a separate file.
 - Operational: JSON file is human-inspectable, works with existing static-import or readFile patterns, and avoids schema migrations. For scale (hundreds per quarter), a single file remains manageable; if volume grows, the merge interface allows swapping to a DB later without changing consumers.
 
 **Alternatives considered**:
-- **Extend `data/evaluations.json`**: Add 360 rows with a `source: "360"` discriminator. Rejected: mixes two different lifecycles (bulk import vs form submit) and would require careful handling of overwrites (replace by rater-subject-quarter) in a single array; separate file keeps concerns clear.
+- **Extend evaluation source (e.g. Google Sheet)**: Add 360 rows with a `source: "360"` discriminator. Rejected: mixes two different lifecycles (bulk import vs form submit) and would require careful handling of overwrites (replace by rater-subject-quarter) in a single array; separate file keeps concerns clear.
 - **Database (e.g. SQLite/Postgres)**: Rejected for MVP; constitution favors simplicity. Can revisit if retention or query needs grow.
 
 ---

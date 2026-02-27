@@ -18,15 +18,15 @@ export default async function CoachDashboardPage({
   searchParams: Promise<{ coach?: string }>;
 }) {
   const { coach: coachParam } = await searchParams;
-  const coachNames = getUniqueCoachNames();
+  const coachNames = await getUniqueCoachNames();
   const firstCoach = coachNames[0];
   if (!firstCoach) redirect("/dashboard/admin");
   const coachName = coachParam && coachNames.includes(coachParam) ? coachParam : firstCoach;
   if (!coachParam || !coachNames.includes(coachParam)) {
     redirect(`/dashboard/coach?coach=${encodeURIComponent(coachName)}`);
   }
-  const snapshots = getMergedRecordsForDashboard({ coachName });
-  const quarters = getQuartersSorted();
+  const snapshots = await getMergedRecordsForDashboard({ coachName });
+  const quarters = await getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
   const developers = Array.from(
     new Set(

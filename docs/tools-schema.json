@@ -1,0 +1,51 @@
+{
+  "description": "Read-only tools for the Rubric Dashboard. Call these over GET with query params; require same-origin auth (session). Base URL: your app origin (e.g. https://your-app.vercel.app or http://localhost:3000).",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_risk_summary",
+        "description": "Get risk summary for the rubric dashboard: total developers, at-risk count, percentage at risk, and breakdown by flag (lowScore, declining, stagnant, dataGap). Use for questions like 'How many developers are at risk?' or 'What is Scott's portfolio risk?'",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "quarter": {
+              "type": "string",
+              "description": "Quarter key, e.g. 2025-Q2. Optional; defaults to latest quarter."
+            },
+            "coach": {
+              "type": "string",
+              "description": "Coach name for portfolio-level risk (e.g. 'Scott Rust'). Admin only; omit for org-wide."
+            }
+          },
+          "required": []
+        },
+        "path": "/api/tools/risk-summary",
+        "method": "GET"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_subject_distribution",
+        "description": "Get one person's (subject's) evaluation distribution for a quarter: scores 1-4 per dimension (Tech Mastery, Build Trust, Resilient Under Pressure, Team Player, Move Fast), at-risk flag, and risk flags. Use for questions like 'How did Ruvi Raghavan do this quarter?' or 'What are the scores for [name]?'",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "subject": {
+              "type": "string",
+              "description": "Full name of the person (consultant) as in the system, e.g. 'Ruvi Raghavan'."
+            },
+            "quarter": {
+              "type": "string",
+              "description": "Quarter key, e.g. 2025-Q2. Optional; defaults to latest quarter."
+            }
+          },
+          "required": ["subject"]
+        },
+        "path": "/api/tools/subject-distribution",
+        "method": "GET"
+      }
+    }
+  ]
+}

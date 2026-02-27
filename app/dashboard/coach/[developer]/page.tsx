@@ -16,18 +16,18 @@ export default async function CoachDeveloperDetailPage({
   searchParams: Promise<{ coach?: string }>;
 }) {
   const { coach: coachParam } = await searchParams;
-  const coachNames = getUniqueCoachNames();
+  const coachNames = await getUniqueCoachNames();
   const firstCoach = coachNames[0];
   if (!firstCoach) redirect("/dashboard/admin");
   const coachName = coachParam && coachNames.includes(coachParam) ? coachParam : firstCoach;
 
   const developerName = decodeURIComponent((await params).developer);
-  const snapshots = getMergedRecordsForDashboard({ coachName });
+  const snapshots = await getMergedRecordsForDashboard({ coachName });
   const coachSnapshots = snapshots.filter((s) => s.consultantName === developerName);
   if (coachSnapshots.length === 0) redirect(`/dashboard/coach?coach=${encodeURIComponent(coachName)}`);
 
   const timeline = getDeveloperTimeline(snapshots, coachName, developerName);
-  const quarters = getQuartersSorted();
+  const quarters = await getQuartersSorted();
   const history = Array.from(timeline.keys())
     .sort()
     .map((k) => timeline.get(k)!);

@@ -15,8 +15,8 @@ export default async function CoachPortfolioPage({
   const { coachName } = await params;
   const decoded = decodeURIComponent(coachName);
   if (isHiddenCoach(decoded)) redirect("/dashboard/admin/coaches");
-  const snapshots = getMergedRecordsForDashboard();
-  const quarters = getQuartersSorted();
+  const snapshots = await getMergedRecordsForDashboard();
+  const quarters = await getQuartersSorted();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
   const coachSnapshots = snapshots.filter((s) => s.coachName === decoded && s.quarterKey === currentQuarterKey);
   const developers = Array.from(new Set(coachSnapshots.map((s) => s.consultantName))).sort();

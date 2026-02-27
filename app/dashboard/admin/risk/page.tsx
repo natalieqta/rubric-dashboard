@@ -6,8 +6,9 @@ import { RiskTable } from "./RiskTable";
 import type { DeveloperQuarterSnapshot } from "@/lib/schema";
 
 export default async function AdminRiskPage() {
-  const snapshots = getMergedRecordsForDashboard();
-  const quarters = getQuartersSorted();
+  const snapshots = await getMergedRecordsForDashboard();
+  const quarters = await getQuartersSorted();
+  const coaches = await getUniqueCoachNames();
   const currentQuarterKey = quarters.length ? quarters[quarters.length - 1]!.quarterKey : "";
   const onePerDev = getSnapshotsOnePerDeveloper(snapshots, currentQuarterKey);
 
@@ -57,7 +58,7 @@ export default async function AdminRiskPage() {
       <RiskTable
         rows={atRiskRows}
         quarters={quarters}
-        coaches={getUniqueCoachNames()}
+        coaches={coaches}
       />
     </div>
   );

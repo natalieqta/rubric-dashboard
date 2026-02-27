@@ -7,7 +7,7 @@
 All dashboard metrics MUST use distribution counts and percentages across the four levels (L1–L4: Below Expectations, Progressing, Meets Expectations, Exceeds Expectations). The "Average Score" column from the source data MUST NOT be used for any chart, KPI, or decision. Rationale: Averages hide risk and skew; distributions expose who needs support and trends.
 
 ### II. Single Source of Truth for Evaluations
-Evaluation data has exactly one source: `data/evaluations.json`. All reads MUST go through `lib/evaluations.ts` (and related parsing/schema in `lib/`). No ad-hoc parsing of the JSON elsewhere. Rationale: Ensures consistent quartering, coach filtering, and caching; avoids drift between views.
+Evaluation data has exactly one source: **Google Sheets** (fetched via `lib/evaluations-sheet.ts` and exposed through `lib/evaluations.ts`). All reads MUST go through `lib/evaluations.ts` (and related parsing/schema in `lib/`). No ad-hoc parsing elsewhere. Rationale: Ensures consistent quartering, coach filtering, and caching; avoids drift between views.
 
 ### III. Role-Based Access and Scoping
 Admin sees org-wide data and user management; Coach sees only data for their own `coachName`. All queries and UI MUST respect session role and coach scoping. Coach user accounts MUST have `coachName` that exactly matches a Coach Name present in the evaluation data (case-sensitive). Rationale: Protects confidentiality and keeps coach views relevant.
@@ -27,7 +27,7 @@ Prefer simple, readable code over clever abstractions. Avoid adding dependencies
 ## Development Workflow
 
 - **Specs and plans**: When adding a new dashboard view or metric, the spec MUST state how it complies with Principle I (distribution-only, no averages) and Principle III (scoping).
-- **Data changes**: Changing the shape of `evaluations.json` or the parsing logic MUST be accompanied by updated types in `lib/schema.ts` and any affected dashboard components.
+- **Data changes**: Changing the shape of the evaluation sheet or the parsing logic MUST be accompanied by updated types in `lib/schema.ts` and any affected dashboard components.
 - **Review**: Changes that touch evaluation aggregation, coach filtering, or role checks MUST be reviewed for constitution compliance (no averages, correct scoping, coach name consistency).
 
 ## Governance

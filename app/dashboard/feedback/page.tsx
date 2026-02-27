@@ -2,7 +2,7 @@ import { getCanonicalSubjectNames } from "@/lib/evaluations";
 import { FeedbackFormClient } from "./FeedbackFormClient";
 
 export default async function FeedbackPage() {
-  const subjects = getCanonicalSubjectNames();
+  const subjects = await getCanonicalSubjectNames();
 
   return (
     <div className="space-y-6">

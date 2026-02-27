@@ -3,10 +3,10 @@ import { getDistributionForSnapshots, getSnapshotsOnePerDeveloper, getDeveloperA
 import { TrendsClient } from "./TrendsClient";
 
 export default async function AdminTrendsPage() {
-  const allSnapshots = getMergedRecordsForDashboard();
+  const allSnapshots = await getMergedRecordsForDashboard();
   const snapshots = allSnapshots.filter((s) => !isHiddenCoach(s.coachName));
-  const quarters = getQuartersSorted();
-  const coaches = getUniqueCoachNames();
+  const quarters = await getQuartersSorted();
+  const coaches = await getUniqueCoachNames();
   const developerMetrics = getDeveloperAverageScoreByQuarter(snapshots, quarters);
   const developerNames = [...new Set(developerMetrics.map((m) => m.consultantName))].sort();
 

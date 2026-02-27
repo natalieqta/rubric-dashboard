@@ -8,6 +8,6 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const subjects = getCanonicalSubjectNames();
+  const subjects = await getCanonicalSubjectNames();
   return NextResponse.json({ subjects });
 }
