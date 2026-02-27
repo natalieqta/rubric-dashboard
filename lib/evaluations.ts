@@ -4,7 +4,7 @@
  */
 
 import { getRawEvaluationsFromSheet } from "@/lib/evaluations-sheet";
-import { getQuarterLabel } from "./quarters";
+import { getQuarterLabel, getQuarterFromDate, getQuarterKey } from "./quarters";
 import { parseEvaluationRow, type RawEvaluationRow } from "./parse";
 import type { ParsedEvaluation, DeveloperQuarterSnapshot } from "./schema";
 import { listFeedback360 } from "./feedback-360";
@@ -79,12 +79,19 @@ export async function getUniqueCoachNames(): Promise<string[]> {
   return Array.from(set).filter((name) => !isHiddenCoach(name)).sort();
 }
 
-/** All quarter keys (e.g. 2025-Q2) sorted ascending; labels for display. */
+/** All quarter keys (e.g. 2025-Q2) sorted ascending; labels for display. Includes current quarter even if no data yet (e.g. Q1 2026 (Unfinished)). */
 export async function getQuartersSorted(options?: { now?: Date }): Promise<{ quarterKey: string; quarterLabel: string }[]> {
+  const now = options?.now ?? new Date();
   const parsed = await getParsedEvaluations(options);
   const seen = new Map<string, string>();
   for (const p of parsed) {
     if (!seen.has(p.quarterKey)) seen.set(p.quarterKey, p.quarterLabel);
+  }
+  // Ensure current quarter is always included so we can view/filter Q1 2026 etc. before data exists
+  const { year, quarter } = getQuarterFromDate(now);
+  const currentKey = getQuarterKey(year, quarter);
+  if (!seen.has(currentKey)) {
+    seen.set(currentKey, getQuarterLabel(year, quarter, { now }));
   }
   const keys = Array.from(seen.keys()).sort();
   return keys.map((quarterKey) => ({ quarterKey, quarterLabel: seen.get(quarterKey)! }));
